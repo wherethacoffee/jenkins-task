@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Install Dependencies and Test') {
             steps {
-                nodejs(nodeJSInstallationName: 'Node 7.8.0') {
+                nodejs(nodeJSInstallationName: 'node') {
                     sh '''
                         npm install
                         npm test
