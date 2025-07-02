@@ -4,12 +4,23 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = (env.BRANCH_NAME == 'dev') ? 'nodedev' : 'nodemain'
-        HOST_PORT = (env.BRANCH_NAME == 'dev') ? '3001' : '3000' 
         IMAGE_TAG = 'v1.0'
     } 
 
     stages {
+        stage('Set Variables') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'dev') {
+                        env.IMAGE_NAME = 'nodedev'
+                        env.HOST_PORT = '3001'
+                    } else {
+                        env.IMAGE_NAME = 'nodemain'
+                        env.HOST_PORT = '3000'
+                    }
+                }
+            }
+        }
         stage('Install Dependencies and Test') {
             steps {
                 nodejs(nodeJSInstallationName: 'node') {
