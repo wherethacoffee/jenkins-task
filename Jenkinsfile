@@ -3,10 +3,6 @@ pipeline {
         label 'jenkins_agent'
     }
 
-    tools {
-        nodejs 'NODEJS 7.8.0'
-    }
-
     environment {
         IMAGE_NAME = 'nodedev'
         IMAGE_TAG = 'v1.0'
