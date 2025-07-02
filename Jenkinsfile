@@ -4,7 +4,8 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = 'nodedev'
+        IMAGE_NAME = (env.BRANCH_NAME == 'dev') ? 'nodedev' : 'nodemain'
+        HOST_PORT = (env.BRANCH_NAME == 'dev') ? '3001' : '3000' 
         IMAGE_TAG = 'v1.0'
     } 
 
@@ -20,6 +21,23 @@ pipeline {
             }
         }
 
+        stage('Stop and Clean Previous Containers') {
+            steps {
+                script {
+                    echo "Stopping and removing any existing container for image: ${IMAGE_NAME}"
+                    sh '''
+                        set +e
+                        container_id=$(docker ps -q --filter "ancestor=${IMAGE_NAME}:${IMAGE_TAG}")
+                        if [ -n "$container_id" ]; then
+                            docker stop $container_id
+                            docker rm $container_id
+                        fi
+                        set -e
+                    '''
+                }
+            }
+        }
+
         stage('Build Image') {
             steps {
                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .' 
@@ -28,7 +46,7 @@ pipeline {
 
         stage('Run Container') {
             steps {
-                sh 'docker run -d --expose 3001 -p 3001:3000 $IMAGE_NAME:$IMAGE_TAG'
+                sh 'docker run -d --expose $HOST_PORT -p $HOST_PORT:3000 $IMAGE_NAME:$IMAGE_TAG'
             }
         }
     }
