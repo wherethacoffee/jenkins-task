@@ -3,25 +3,20 @@ pipeline {
         label 'jenkins_agent'
     }
 
-    tools {
-        nodejs 'NODEJS 7.8.0'
-    }
-
     environment {
         IMAGE_NAME = 'nodemain'
         IMAGE_TAG = 'v1.0'
     } 
 
     stages {
-        stage('Install Dependencies') {
+        stage('Install Dependencies and Test') {
             steps {
-                sh 'npm install'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'npm test'
+                nodejs(nodeJSInstallationName: 'Node 7.8.0') {
+                    sh '''
+                        npm install
+                        npm test
+                    '''
+                }
             }
         }
 
